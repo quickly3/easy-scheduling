@@ -5,7 +5,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "electron-packager . demo --win --platform=win32 --arch=ia32 --overwrite --ignore=node_module --icon=./src/favicon.ico --electron-zip-dir=C:\\Users\\Administrator\\Downloads\\",
+    "build": "electron-packager . demo --win --platform=win32 --arch=ia32 --overwrite  --icon=./src/favicon.ico --electron-zip-dir=C:\\Users\\Administrator\\Downloads\\",
+    "rebuild": "electron-rebuild -f -w exceljs",
     "se": "ng build --base-href ./ && electron .",
     "test": "ng test",
     "lint": "ng lint",
@@ -30,9 +31,6 @@
     "rxjs": "~6.4.0",
     "ts-lint": "^4.5.1",
     "tslib": "^1.9.0",
-    "xlsx": "^0.16.1",
-    "xlsx-populate": "^1.21.0",
-    "xlsx-style": "^0.8.13",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
@@ -45,6 +43,7 @@
     "@types/node": "^8.10.61",
     "codelyzer": "^5.0.0",
     "electron": "^9.0.0",
+    "electron-rebuild": "^1.11.0",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.1.0",

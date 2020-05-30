@@ -1,21 +1,38 @@
 <!--The content below is only a placeholder and can be replaced.-->
 
 
+<div class="container-fluid mt-2">
+  <div class="actions mb-2">
+    <input id="uploadBtn" type="file" (change)="readExcel($event)"
+    class="upload input-common" required />
 
-<input id="uploadBtn" type="file" (change)="readExcel($event)"
-           class="upload input-common" required />
+    <button class="btn btn-sm btn-success mr-2" (click)="download()">下载</button>
+    <button class="btn btn-sm btn-success mr-2" (click)="onIpc()">存档</button>
+    <button class="btn btn-sm btn-success mr-2" (click)="onLoadCache()">读档</button>
+    <button class="btn btn-sm btn-success mr-2" (click)="changeSch(notice,exchConfirm)">调班</button>
+    <button class="btn btn-sm btn-primary mr-2" (click)="showExchLogs(logtpl)">调班记录</button>
+  </div>
 
-<button class="btn btn-sm btn-success" (click)="onSave()">下载</button>
-<button class="btn btn-sm btn-success" (click)="onIpc()">Ipc</button>
-
-<table class="sjs-table">
-  <tr *ngFor="let row of data">
-    <td *ngFor="let cell of row">
-      <div class="cell" [ngStyle]="{'background-color': cell.fgColor}">{{cell.value}}</div>
-    </td>
-  </tr>
-</table>
-
+  <div class="excel table-responsive">
+    <table class="table table-sm table-hover table-bordered">
+      <tr *ngFor="let row of data">
+        <td *ngFor="let cell of row" class="sch-td">
+          <div class="cell"
+               ngbTooltip="{{cell.value}}"
+               [ngStyle]="{'background-color': cell.fgColor}"
+          >
+            <label><input type="checkbox"
+                *ngIf="cell.showCK"
+                [(ngModel)]="cell.checked"
+                (click)="cellClick($event,cell)"
+                class="cell-ck"
+                >{{cell.value}}</label>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
 
 <!-- <table class="table">
   <tr *ngFor="let sch of schedules">
@@ -23,6 +40,59 @@
     <td >{{sch.time}}</td>
   </tr>
 </table> -->
+
+<ng-template #notice let-modal>
+  <div class="modal-body">
+    <span class="text">请选择要调换的两个班次</span>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('Save click')">关闭</button>
+  </div>
+</ng-template>
+
+<ng-template #exchConfirm let-modal>
+  <div class="modal-body">
+    <div class="text">确定要调换的这两个班次？</div>
+
+    <table class="tab">
+      <tr>
+        <td>姓名</td>
+        <td>日期</td>
+        <td>班次</td>
+      </tr>
+      <tr>
+        <td><span class="text text-danger mr-1">{{schArray[0].member}}</span></td>
+        <td><span class="text text-success mr-1">{{schArray[0].date}}</span></td>
+        <td><span class="texts mr-1">{{schArray[0].value}}</span></td>
+      </tr>
+      <tr>
+        <td><span class="text text-danger mr-1">{{schArray[1].member}}</span></td>
+        <td><span class="text text-success mr-1">{{schArray[1].date}}</span></td>
+        <td><span class="texts mr-1">{{schArray[1].value}}</span></td>
+      </tr>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('close')">关闭</button>
+    <button type="button" class="btn btn-sm btn-primary" (click)="modal.close('sure')">确定</button>
+  </div>
+</ng-template>
+
+<ng-template #logtpl let-modal>
+  <div class="modal-body">
+    <div class="h5">调班记录：</div>
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor="let log of exchageLog; let i = index">
+        <span>&nbsp;{{i+1}}:&nbsp;</span>
+        <span>{{log}}</span>
+      </li>
+    </ul>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('close')">关闭</button>
+  </div>
+</ng-template>
 
 
 <router-outlet></router-outlet>
