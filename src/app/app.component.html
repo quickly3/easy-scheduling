@@ -1,16 +1,26 @@
 <!--The content below is only a placeholder and can be replaced.-->
 
 
-<div class="container-fluid mt-2">
+<div class="container-fluid mt-2 main-container">
   <div class="actions mb-2">
     <input id="uploadBtn" type="file" (change)="readExcel($event)"
-    class="upload input-common" required />
+    class="upload input-common btn btn-sm btn-secondary mr-2" required />
 
-    <button class="btn btn-sm btn-success mr-2" (click)="download()">下载</button>
-    <button class="btn btn-sm btn-success mr-2" (click)="onIpc()">存档</button>
-    <button class="btn btn-sm btn-success mr-2" (click)="onLoadCache()">读档</button>
-    <button class="btn btn-sm btn-success mr-2" (click)="changeSch(notice,exchConfirm)">调班</button>
-    <button class="btn btn-sm btn-primary mr-2" (click)="showExchLogs(logtpl)">调班记录</button>
+    <button [disabled]="stop_action" class="btn btn-sm btn-success mr-2" (click)="changeSch(notice,exchConfirm)">调班</button>
+    <button [disabled]="stop_action" class="btn btn-sm btn-info mr-2" (click)="showExchLogs(logtpl)">调班记录</button>
+
+    <button [disabled]="stop_action" class="btn btn-sm btn-danger mr-2" (click)="onSave(saveConfirm)">保存修改</button>
+    <button [disabled]="stop_action" class="btn btn-sm btn-primary mr-2" (click)="onLoadCache(saveConfirm)">重新载入</button>
+    <button [disabled]="stop_action" class="btn btn-sm btn-warning mr-2" (click)="download(notice)">下载到电脑</button>
+    <div class="alert alert-info p-1" style="display: inline-block;" [hidden]="!saving">
+      <span>保存中</span>
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div class="alert alert-danger p-1" style="display: inline-block;" [hidden]="!wb_changed">
+      <span class="text">修改还未保存，请及时保存。</span>
+    </div>
   </div>
 
   <div class="excel table-responsive">
@@ -18,7 +28,7 @@
       <tr *ngFor="let row of data">
         <td *ngFor="let cell of row" class="sch-td">
           <div class="cell"
-               ngbTooltip="{{cell.value}}"
+               ngbTooltip="{{cell.member}} | {{cell.date}} | {{cell.value}}"
                [ngStyle]="{'background-color': cell.fgColor}"
           >
             <label><input type="checkbox"
@@ -43,10 +53,20 @@
 
 <ng-template #notice let-modal>
   <div class="modal-body">
-    <span class="text">请选择要调换的两个班次</span>
+    <span class="text">{{message}}</span>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('Save click')">关闭</button>
+  </div>
+</ng-template>
+
+<ng-template #saveConfirm let-modal>
+  <div class="modal-body">
+    <div class="text">{{message}}</div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-primary" (click)="modal.close('sure')">确定</button>
+    <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('close')">关闭</button>
   </div>
 </ng-template>
 
@@ -54,40 +74,85 @@
   <div class="modal-body">
     <div class="text">确定要调换的这两个班次？</div>
 
-    <table class="tab">
+    <table class="table table-sm">
       <tr>
         <td>姓名</td>
         <td>日期</td>
-        <td>班次</td>
+        <td>调班前</td>
+        <td>调班后</td>
+        <td></td>
       </tr>
       <tr>
         <td><span class="text text-danger mr-1">{{schArray[0].member}}</span></td>
         <td><span class="text text-success mr-1">{{schArray[0].date}}</span></td>
-        <td><span class="texts mr-1">{{schArray[0].value}}</span></td>
+        <td><span class="texts mr-1" style="width: 250px;">{{schArray[0].value}}</span></td>
+        <td>
+          <div [hidden]="!fix0Active" style="width: 250px;">
+            <input type="text" [(ngModel)]="schArray[0].fixValue" class="form-control" name="" id="">
+
+          </div>
+          <div [hidden]="fix0Active" style="width: 250px;">
+            <span class="texts mr-1">{{schArray[0].fixValue}}</span>
+          </div>
+        </td>
+        <td>
+          <button [hidden]="!fix0Active" type="button" class="close" aria-label="关闭" (click)="fix0Active = !fix0Active">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <button [hidden]="fix0Active" class="btn btn-sm btn-primary" (click)="fix0Active = !fix0Active">修改</button>
+        </td>
       </tr>
       <tr>
         <td><span class="text text-danger mr-1">{{schArray[1].member}}</span></td>
         <td><span class="text text-success mr-1">{{schArray[1].date}}</span></td>
-        <td><span class="texts mr-1">{{schArray[1].value}}</span></td>
+        <td><span class="texts mr-1" style="width: 250px;">{{schArray[1].value}}</span></td>
+        <td>
+          <div [hidden]="!fix1Active" style="width: 250px;">
+            <input type="text" [(ngModel)]="schArray[1].fixValue" class="form-control" name="" id="">
+          </div>
+          <div [hidden]="fix1Active" style="width: 250px;">
+            <span class="texts mr-1">{{schArray[1].fixValue}}</span>
+          </div>
+        </td>
+        <td>
+          <button [hidden]="!fix1Active" type="button" class="close" aria-label="关闭" (click)="fix1Active = !fix1Active">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <button [hidden]="fix1Active" class="btn btn-sm btn-primary" (click)="fix1Active = !fix1Active">修改</button>
+        </td>
       </tr>
     </table>
   </div>
   <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-primary" [disabled]="logging" (click)="modal.close('sure')">确定</button>
     <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('close')">关闭</button>
-    <button type="button" class="btn btn-sm btn-primary" (click)="modal.close('sure')">确定</button>
   </div>
 </ng-template>
 
 <ng-template #logtpl let-modal>
   <div class="modal-body">
     <div class="h5">调班记录：</div>
-    <ul class="list-group">
-      <li class="list-group-item" *ngFor="let log of exchageLog; let i = index">
-        <span>&nbsp;{{i+1}}:&nbsp;</span>
-        <span>{{log}}</span>
-      </li>
-    </ul>
-
+    <table class="table table-sm table-hover table-bordered">
+      <tr>
+        <th width="85px">操作日期</th>
+        <th width="70px">姓名</th>
+        <th width="70px">日期</th>
+        <th>调班前</th>
+        <th>调班后</th>
+        <th width="70px">---</th>
+        <th width="70px">姓名</th>
+        <th width="70px">日期</th>
+        <th>调班前</th>
+        <th>调班后</th>
+      </tr>
+      <tr *ngFor="let logArr of exchageLog; let i = index">
+        <td style="" *ngFor="let logItem of logArr">
+          <div class="log-table-item" ngbTooltip="{{logItem}}">
+            <span>{{logItem}}</span>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-sm btn-danger" (click)="modal.close('close')">关闭</button>

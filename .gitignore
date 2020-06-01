@@ -45,3 +45,6 @@ testem.log
 .DS_Store
 Thumbs.db
 demo-win32-ia32/
+schedule-win32-ia32/
+scheduling.rar
+cache.xlsx

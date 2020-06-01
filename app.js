@@ -8,7 +8,7 @@ const path = require("path");
 const fs = require("fs");
 const Excel = require('exceljs');
 
-const cacheFile = "test.xlsx";
+const cacheFile = "cache.xlsx";
 
 let appWindow
 
@@ -18,7 +18,7 @@ function initWindow() {
     height: 800,
     webPreferences: {
       nodeIntegration: true,
-      devTools: true
+      devTools: false
     }
   });
 
@@ -33,10 +33,6 @@ function initWindow() {
 
   // Initialize the DevTools.
   appWindow.webContents.openDevTools()
-
-
-
-
   appWindow.on('closed', function () {
     appWindow = null
   })
@@ -58,19 +54,17 @@ app.on('activate', function () {
 
   if (appWindow === null) {
     initWindow()
-
-
   }
 })
 
-ipcMain.on('asynchronous-message', function (event, arg) {
+ipcMain.on('save-buffer', function (event, arg) {
 
   var workbook = new Excel.Workbook();
   workbook.xlsx.load(arg.buffer).then(()=>{
     workbook.xlsx.writeFile(cacheFile);
   })
 
-  event.sender.send('asynchronous-reply', 'pong')
+  event.sender.send('save-buffer-done', 'pong')
 })
 
 

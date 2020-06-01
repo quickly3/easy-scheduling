@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "electron-packager . demo --win --platform=win32 --arch=ia32 --overwrite  --icon=./src/favicon.ico --electron-zip-dir=C:\\Users\\Administrator\\Downloads\\",
+    "build": "electron-packager . schedule --win --platform=win32 --arch=ia32 --overwrite  --icon=./src/favicon.ico --electron-zip-dir=C:\\Users\\Administrator\\Downloads\\",
     "rebuild": "electron-rebuild -f -w exceljs",
     "se": "ng build --base-href ./ && electron .",
     "test": "ng test",
