@@ -21,7 +21,6 @@ function initWindow() {
       devTools: false
     }
   });
-
   // Electron Build Path
   appWindow.loadURL(
     url.format({
