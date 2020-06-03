@@ -18,7 +18,7 @@ function initWindow() {
     height: 800,
     webPreferences: {
       nodeIntegration: true,
-      devTools: false
+      devTools: true
     }
   });
   // Electron Build Path

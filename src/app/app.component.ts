@@ -136,6 +136,11 @@ export class AppComponent {
     this.main_worksheet = this.wb.getWorksheet(1);
     this.log_worksheet = this.wb.getWorksheet(2);
 
+    if(!this.log_worksheet){
+      this.log_worksheet = this.wb.addWorksheet("Sheet2");
+    }
+
+
     this.main_worksheet.eachRow( (row, rowNumber) => {
       const table_row = [];
 
